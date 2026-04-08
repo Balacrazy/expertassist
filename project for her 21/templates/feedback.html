@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Session Feedback - ExpertAssist{% endblock %}
+
+{% block extra_head %}
+<style>
+    .feedback-layout {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: calc(100vh - 140px);
+        padding: 40px 0;
+    }
+    .feedback-card {
+        width: 100%;
+        max-width: 500px;
+        background: var(--bg-card);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-light);
+        padding: 40px;
+        text-align: center;
+    }
+    .rating-group {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin: 24px 0;
+        font-size: 2.2rem;
+        flex-direction: row-reverse;
+    }
+    .rating-group input {
+        display: none;
+    }
+    .rating-group label {
+        color: var(--border-light);
+        cursor: pointer;
+        transition: 0.2s all;
+    }
+    .rating-group label:hover,
+    .rating-group label:hover ~ label,
+    .rating-group input:checked ~ label {
+        color: var(--warning-color);
+        transform: scale(1.1);
+    }
+    
+    .radio-pill-group {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 12px;
+    }
+    
+    .radio-pill {
+        position: relative;
+        cursor: pointer;
+    }
+    .radio-pill input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+    .radio-pill span {
+        display: inline-block;
+        padding: 10px 20px;
+        background: var(--bg-app);
+        border: 2px solid var(--border-light);
+        border-radius: 9999px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--text-dark);
+        transition: all 0.2s;
+    }
+    .radio-pill input:checked ~ span {
+        border-color: var(--accent-primary);
+        background: var(--accent-light);
+        color: var(--accent-primary);
+    }
+    
+    .report-card {
+        margin-top: 24px;
+        text-align: left;
+        background: #fef2f2;
+        border: 1px solid #fca5a5;
+        padding: 24px;
+        border-radius: var(--radius-lg);
+        animation: slideDown 0.3s ease;
+    }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="feedback-layout fade-in">
+    <div class="feedback-card">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: #ecfdf5; color: var(--success-color); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 20px auto;">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        
+        <h2 style="margin-bottom: 8px; color: var(--text-dark); font-size: 1.6rem;">Session Completed</h2>
+        <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 1rem;">How was your experience working with this user?</p>
+
+        <form method="POST">
+            <div class="rating-group">
+                <input type="radio" id="star5" name="rating" value="5" required /><label for="star5" title="5 stars"><i class="fas fa-star"></i></label>
+                <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars"><i class="fas fa-star"></i></label>
+                <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars"><i class="fas fa-star"></i></label>
+                <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars"><i class="fas fa-star"></i></label>
+                <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star"><i class="fas fa-star"></i></label>
+            </div>
+
+            <div class="form-group" style="text-align: center; margin-bottom: 32px;">
+                <label style="font-weight: 600; font-size: 1.05rem; margin-bottom: 12px;">Were you completely satisfied?</label>
+                <div class="radio-pill-group">
+                    <label class="radio-pill">
+                        <input type="radio" name="satisfied" value="yes" required>
+                        <span><i class="fas fa-thumbs-up" style="margin-right: 6px;"></i> Yes, totally</span>
+                    </label>
+                    <label class="radio-pill">
+                        <input type="radio" name="satisfied" value="no">
+                        <span><i class="fas fa-thumbs-down" style="margin-right: 6px;"></i> Not really</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group" style="text-align: left;">
+                <label>Additional Comments (Optional)</label>
+                <textarea name="comment" rows="3" placeholder="Any specific feedback or praise?"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.05rem;">Submit Feedback</button>
+        </form>
+        
+        <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-light);">
+            <a href="#" onclick="document.getElementById('report-sec').style.display='block'; this.style.display='none';" style="color: var(--danger-color); text-decoration: none; font-size: 0.95rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-flag"></i> Report a problem
+            </a>
+        </div>
+        
+        <div id="report-sec" style="display: none;" class="report-card">
+            <h4 style="color: var(--danger-color); margin-bottom: 16px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;"><i class="fas fa-exclamation-triangle"></i> Submit a Report</h4>
+            <form method="POST" action="{{ url_for('report_session', session_id=session_id) }}" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label style="color: var(--text-dark);">Describe the Issue</label>
+                    <input type="text" name="report_reason" required placeholder="Abusive behavior, spam, missed session..." style="background: #fff; border-color: #fca5a5;">
+                </div>
+                <div class="form-group">
+                    <label style="color: var(--text-dark);">Attach Proof (Screenshot)</label>
+                    <input type="file" name="proof" required style="padding: 10px; background: #fff; border-color: #fca5a5; cursor: pointer;">
+                </div>
+                <button class="btn btn-danger" style="width: 100%; padding: 12px; margin-top: 8px;"><i class="fas fa-paper-plane"></i> File Report</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
